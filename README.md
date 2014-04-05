@@ -19,9 +19,12 @@ The first link in every @slate tweet is stored in a redis set.
 
 ## Setup
 
-Clone the repo and:
+Clone the repo, and:
 
 ```
 npm install
+cp config.json.example config.json
+# fill in your twitter details
+vim config.json
 coffee index.coffee
 ```
