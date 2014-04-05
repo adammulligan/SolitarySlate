@@ -3,6 +3,9 @@
 A Twitter bot that retweets @slate the first time they post a link, but
 ignores reposts.
 
+I run this in production
+[@SolitarySlate](https://twitter.com/SolitarySlate)
+
 ## How it works
 
 The script runs as a demon, listening for @slate tweets (could be any
