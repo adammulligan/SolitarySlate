@@ -1,0 +1,11 @@
+{
+  "twitter_oauth": {
+    "consumer_key":         "",
+    "consumer_secret":      "",
+    "access_token":         "",
+    "access_token_secret":  ""
+  },
+  "redis": {
+    "set_name": "slate_links"
+  }
+}
