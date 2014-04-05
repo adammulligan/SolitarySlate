@@ -20,7 +20,9 @@ getFirstUrlFromTweet = (tweet) ->
   urlRegex = new RegExp("(https?):\/\/[a-zA-Z0-9+&@#\/%?=~_|!:,.;]*", "g")
   return tweet.text.match(urlRegex)?[0]
 
+# @slate
 userId = 15164565
+
 stream = T.stream('statuses/filter', follow: [userId])
 stream.on('tweet', (tweet) ->
   return unless tweet.user.id is userId
