@@ -34,7 +34,7 @@ stream.on('tweet', (tweet) ->
     options = {
       url: url
       followAllRedirects: true
-      headers: headers
+      headers: HEADERS
     }
 
     request(url, (err, res) ->
