@@ -37,7 +37,7 @@ stream.on('tweet', (tweet) ->
       headers: HEADERS
     }
 
-    request(url, (err, res) ->
+    request(options, (err, res) ->
       return if err?
 
       expandedUrl = res.request.uri.href
