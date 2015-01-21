@@ -6,6 +6,7 @@ HEADERS = {
 }
 
 request = require 'request'
+url = require 'url'
 
 redis = require 'redis'
 redisClient = redis.createClient()
@@ -29,10 +30,10 @@ stream = T.stream('statuses/filter', follow: [USER_ID])
 stream.on('tweet', (tweet) ->
   return unless tweet.user.id is USER_ID
 
-  url = getFirstUrlFromTweet(tweet)
-  if url?
+  urlFromTweet = getFirstUrlFromTweet(tweet)
+  if urlFromTweet?
     options = {
-      url: url
+      url: urlFromTweet
       followAllRedirects: true
       headers: HEADERS
     }
@@ -40,7 +41,7 @@ stream.on('tweet', (tweet) ->
     request(options, (err, res) ->
       return if err?
 
-      expandedUrl = res.request.uri.href
+      expandedUrl = url.parse(res.request.uri.href).pathname
       console.log "Got a Slate tweet with this URL: #{expandedUrl}..."
 
       redisClient.sismember(CONFIG.redis.set_name, expandedUrl, (err, reply) ->
