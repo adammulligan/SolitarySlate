@@ -1,3 +1,11 @@
+bunyan = require('bunyan')
+log = bunyan.createLogger(
+  name: 'solitary_slate',
+  streams: [
+    stream: process.stdout
+  ]
+)
+
 CONFIG = require('./config.json')
 USER_ID = 15164565 #@slate
 HEADERS = {
@@ -10,21 +18,26 @@ url = require 'url'
 
 redis = require 'redis'
 redisClient = redis.createClient()
-redisClient.on('error', (err) -> throw new Error(err))
+redisClient.on('error', (err) ->
+  log.fatal {error: err}, "Redis error"
+  throw new Error(err)
+)
 
 Twit = require 'twit'
 T = new Twit(CONFIG.twitter_oauth)
 
 retweet = (tweet) ->
+  return
   T.post("statuses/retweet/#{tweet.id_str}", (err) ->
     if err?
-      console.error "Could not retweet #{tweet.id_str}"
-      console.error err
+      log.error {error: err, tweet_id: tweet.id_str}, "Retweet failed"
   )
 
 getFirstUrlFromTweet = (tweet) ->
   urlRegex = new RegExp("(https?):\/\/[a-zA-Z0-9+&@#\/%?=~_|!:,.;]*", "g")
   return tweet.text.match(urlRegex)?[0]
+
+log.info "Starting up"
 
 stream = T.stream('statuses/filter', follow: [USER_ID])
 stream.on('tweet', (tweet) ->
@@ -42,15 +55,15 @@ stream.on('tweet', (tweet) ->
       return if err?
 
       expandedUrl = url.parse(res.request.uri.href).pathname
-      console.log "Got a Slate tweet with this URL: #{expandedUrl}..."
+      log.info({url: urlFromTweet, path: expandedUrl, tweet_id: tweet.id_str}, "Received tweet")
 
       redisClient.sismember(CONFIG.redis.set_name, expandedUrl, (err, reply) ->
         throw new Error(err) if err?
 
         if reply is 1
-          console.log "...got that one previously, ignoring!"
+          log.info({url: urlFromTweet, path: expandedUrl, tweet_id: tweet.id_str}, "Ignoring tweet")
         else
-          console.log "...never seen that one before, retweeting"
+          log.info({url: urlFromTweet, path: expandedUrl, tweet_id: tweet.id_str}, "Retweeting tweet")
           retweet tweet
           redisClient.sadd(CONFIG.redis.set_name, expandedUrl)
       )
