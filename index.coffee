@@ -27,7 +27,6 @@ Twit = require 'twit'
 T = new Twit(CONFIG.twitter_oauth)
 
 retweet = (tweet) ->
-  return
   T.post("statuses/retweet/#{tweet.id_str}", (err) ->
     if err?
       log.error {error: err, tweet_id: tweet.id_str}, "Retweet failed"
